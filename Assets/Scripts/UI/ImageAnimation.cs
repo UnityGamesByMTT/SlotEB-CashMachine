@@ -34,6 +34,10 @@ public class ImageAnimation : MonoBehaviour
 
 	public float delayBetweenLoop;
 
+	public bool StartOnAwake = false;
+
+	[SerializeField]
+	private Sprite OriginalSprite;
 	private void Awake()
 	{
 		if (Instance == null)
@@ -42,9 +46,17 @@ public class ImageAnimation : MonoBehaviour
 		}
 	}
 
-	private void OnEnable()
-	{
+    private void Start()
+    {
+		OriginalSprite = rendererDelegate.sprite;
+	}
 
+    private void OnEnable()
+	{
+		if(StartOnAwake)
+        {
+			StartAnimation();
+        }
 	}
 
 	private void OnDisable()
