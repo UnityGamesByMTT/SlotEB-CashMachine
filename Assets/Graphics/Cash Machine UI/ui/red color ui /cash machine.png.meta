@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -134,7 +134,28 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: cash machine_0
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 166
+        width: 1893
+        height: 667
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d5a4b41d89c141049249bdde4d17de1
+      internalID: -167698423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -145,7 +166,22 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      cash machine_0: -167698423
+      cash machine_1: -1072753428
+      cash machine_10: -347856993
+      cash machine_11: 1887065546
+      cash machine_12: -1487401209
+      cash machine_13: -102992400
+      cash machine_14: 1203995038
+      cash machine_2: -1040167680
+      cash machine_3: -1793015430
+      cash machine_4: 1281333145
+      cash machine_5: -1074052193
+      cash machine_6: 80149742
+      cash machine_7: 1489841215
+      cash machine_8: 754864714
+      cash machine_9: 1110780893
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

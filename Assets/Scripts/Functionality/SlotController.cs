@@ -33,9 +33,9 @@ public class SlotController : MonoBehaviour
     private Sprite[] Symbol6;
 
     internal bool IsSpinning = false;
+    internal bool IsAutoSpin = false;
 
-    internal int SlotNumber = 3;
-
+    [Header("Integers")]
     [SerializeField]
     private int IconSizeFactor = 0;
     [SerializeField]
@@ -49,10 +49,16 @@ public class SlotController : MonoBehaviour
     [SerializeField]
     private int MidtweenHeight = 0;
 
+    internal int SlotNumber = 3;
+
     private List<Tweener> alltweens = new List<Tweener>();
 
+    private Coroutine AutoSpinRoutine = null;
+    private Coroutine tweenroutine = null;
     [SerializeField]
     private List<int> dummyresponse;
+    [SerializeField]
+    private UIManager uiController;
 
     private void Start()
     {
@@ -60,9 +66,62 @@ public class SlotController : MonoBehaviour
         MidtweenHeight = (15 * MidIconSizeFactor) - 280;
     }
 
+    #region AutoSpin
+    internal void AutoSpin(int count)
+    {
+        if (!IsAutoSpin)
+        {
+            IsAutoSpin = true;
+
+            if (AutoSpinRoutine != null)
+            {
+                StopCoroutine(AutoSpinRoutine);
+                AutoSpinRoutine = null;
+            }
+            AutoSpinRoutine = StartCoroutine(AutoSpinCoroutine(count));
+        }
+    }
+    private void StopAutoSpin()
+    {
+        if (IsAutoSpin)
+        {
+            IsAutoSpin = false;
+            StartCoroutine(StopAutoSpinCoroutine());
+        }
+    }
+
+    private IEnumerator AutoSpinCoroutine(int count)
+    {
+        while (IsAutoSpin && count > 0) 
+        {
+            StartSpin();
+            count--;
+            if (uiController) uiController.updateAutoCount(count);
+            yield return tweenroutine;
+        }
+        StopAutoSpin();
+    }
+
+    private IEnumerator StopAutoSpinCoroutine()
+    {
+        yield return new WaitUntil(() => !IsSpinning);
+        if (AutoSpinRoutine != null || tweenroutine != null)
+        {
+            StopCoroutine(AutoSpinRoutine);
+            StopCoroutine(tweenroutine);
+            tweenroutine = null;
+            AutoSpinRoutine = null;
+            StopCoroutine(StopAutoSpinCoroutine());
+            if (uiController) uiController.ToggleButtonGrp(true);
+        }
+    }
+    #endregion
+
+    #region SpinLogic
     internal void StartSpin()
     {
-        StartCoroutine(TweenRoutine());
+        ResetSpin();
+        tweenroutine = StartCoroutine(TweenRoutine());
     }
 
     private IEnumerator TweenRoutine()
@@ -111,6 +170,10 @@ public class SlotController : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         KillAllTweens();
         IsSpinning = false;
+        if (!IsAutoSpin)
+        {
+            if (uiController) uiController.ToggleButtonGrp(true);
+        }
     }
 
     private void ResetSpin()
@@ -120,6 +183,7 @@ public class SlotController : MonoBehaviour
             Stop_Anims[i].StopAnimation();
         }
     }
+    #endregion
 
     private void PopulateAnimationSprites(ImageAnimation animScript,Image StopImage, int val)
     {
@@ -178,14 +242,14 @@ public class SlotController : MonoBehaviour
         if (IsMid)
         {
             slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-            Tweener tweener = slotTransform.DOLocalMoveY(-MidtweenHeight, 0.2f).SetLoops(-1, LoopType.Restart).SetDelay(0);
+            Tweener tweener = slotTransform.DOLocalMoveY(-MidtweenHeight, 0.4f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
             tweener.Play();
             alltweens.Add(tweener);
         }
         else
         {
             slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-            Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.2f).SetLoops(-1, LoopType.Restart).SetDelay(0);
+            Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.4f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
             tweener.Play();
             alltweens.Add(tweener);
         }
@@ -198,14 +262,14 @@ public class SlotController : MonoBehaviour
             alltweens[index].Pause();
             int tweenpos = (reqpos * (MidIconSizeFactor + MidSpaceFactor)) - (MidIconSizeFactor + (2 * MidSpaceFactor));
             alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (MidSpaceFactor > 0 ? MidSpaceFactor / 4 : 0), 0.5f).SetEase(Ease.OutElastic);
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f);
         }
         else
         {
             alltweens[index].Pause();
             int tweenpos = (reqpos * (IconSizeFactor + SpaceFactor)) - (IconSizeFactor + (2 * SpaceFactor));
             alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (SpaceFactor > 0 ? SpaceFactor / 4 : 0), 0.5f).SetEase(Ease.OutElastic);
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
