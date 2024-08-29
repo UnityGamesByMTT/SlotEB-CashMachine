@@ -81,7 +81,7 @@ public class SlotController : MonoBehaviour
             AutoSpinRoutine = StartCoroutine(AutoSpinCoroutine(count));
         }
     }
-    private void StopAutoSpin()
+    internal void StopAutoSpin()
     {
         if (IsAutoSpin)
         {
@@ -113,6 +113,7 @@ public class SlotController : MonoBehaviour
             AutoSpinRoutine = null;
             StopCoroutine(StopAutoSpinCoroutine());
             if (uiController) uiController.ToggleButtonGrp(true);
+            if (uiController) uiController.StopAutoSpin();
         }
     }
     #endregion
@@ -120,13 +121,13 @@ public class SlotController : MonoBehaviour
     #region SpinLogic
     internal void StartSpin()
     {
-        ResetSpin();
         tweenroutine = StartCoroutine(TweenRoutine());
     }
 
     private IEnumerator TweenRoutine()
     {
         IsSpinning = true;
+        ResetSpin();
         for (int i = 0; i < SlotNumber; i++)
         {
             if (i == 1)
@@ -164,6 +165,10 @@ public class SlotController : MonoBehaviour
             else
             {
                 yield return StopTweening(5, Slot_Transform[i], i);
+            }
+            if (dummyresponse[i] != -1)
+            {
+                Stop_Anims[i].StartAnimation();
             }
         }
 
@@ -234,7 +239,6 @@ public class SlotController : MonoBehaviour
                 StopImage.sprite = Slot_Sprites[5];
                 break;
         }
-        animScript.StartAnimation();
     }
 
     private void InitializeTweening(Transform slotTransform, bool IsMid = false)

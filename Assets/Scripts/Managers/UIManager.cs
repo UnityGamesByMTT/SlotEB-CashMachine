@@ -11,6 +11,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Button Spin_Button;
     [SerializeField]
+    private Button StopAutoSpin_Button;
+    [SerializeField]
     private Button AutoSpinPanel_Button;
     [SerializeField]
     private Button Menu_Button;
@@ -34,8 +36,18 @@ public class UIManager : MonoBehaviour
     private GameObject AutoSpinImage_Object;
     [SerializeField]
     private TMP_Text AutoCounter_Text;
+    [SerializeField]
+    private GameObject BetPanel_Object;
+    [SerializeField]
+    private Button Bet_Button;
+    [SerializeField]
+    private Slider Bet_Slider;
+    [SerializeField]
+    private Slider Denom_Slider;
 
+    private int SpinCount = 0;
     private bool isAtOpen = false;
+    private bool isBetOpen = false;
 
     private void Start()
     {
@@ -50,6 +62,11 @@ public class UIManager : MonoBehaviour
         if (RayCast_Button) RayCast_Button.onClick.RemoveAllListeners();
         if (RayCast_Button) RayCast_Button.onClick.AddListener(OnATClick);
 
+        if (StopAutoSpin_Button) StopAutoSpin_Button.onClick.RemoveAllListeners();
+        if (StopAutoSpin_Button) StopAutoSpin_Button.onClick.AddListener(StoppingAutoSpin);
+
+        
+
         for (int i = 0; i < AutoCount_Buttons.Length; i++)
         {
             switch(i)
@@ -60,19 +77,19 @@ public class UIManager : MonoBehaviour
                     break;
                 case 1:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { StartAutoSpin(10); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(10); OnATClick(); });
                     break;
                 case 2:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { StartAutoSpin(25); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(25); OnATClick(); });
                     break;
                 case 3:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { StartAutoSpin(50); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(50); OnATClick(); });
                     break;
                 case 4:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { StartAutoSpin(100); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(100); OnATClick(); });
                     break;
             }
         }
@@ -98,7 +115,7 @@ public class UIManager : MonoBehaviour
             if (AT_Transform) AT_Transform.DOLocalMoveX(0, 0.5f).OnComplete(delegate
             {
                 if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
-            }); 
+            });
             isAtOpen = true;
         }
         else
@@ -115,13 +132,60 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void StartAutoSpin(int count)
+    private void OnBetClick()
     {
-        ToggleButtonGrp(false);
+        if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = false;
+        if (!isAtOpen)
+        {
+            if (RayCast_Object) RayCast_Object.SetActive(true);
+            if (AT_ImageTransform) AT_ImageTransform.DORotate(new Vector3(0, 180, 0), 0.5f);
+            if (AT_GameObject) AT_GameObject.SetActive(true);
+            if (AT_Transform) AT_Transform.DOLocalMoveX(0, 0.5f).OnComplete(delegate
+            {
+                if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
+            });
+            isAtOpen = true;
+        }
+        else
+        {
+            if (RayCast_Object) RayCast_Object.SetActive(false);
+            if (AT_ImageTransform) AT_ImageTransform.DORotate(new Vector3(0, 0, 0), 0.5f);
+            if (AT_GameObject) AT_GameObject.SetActive(true);
+            if (AT_Transform) AT_Transform.DOLocalMoveX(940, 0.5f).OnComplete(delegate
+            {
+                if (AT_GameObject) AT_GameObject.SetActive(false);
+                if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
+            });
+            isAtOpen = false;
+        }
+    }
+
+    private void ChangeAutoView(int count)
+    {
+        SpinCount = count;
+        if (StopAutoSpin_Button) StopAutoSpin_Button.interactable = true;
         if (AutoSpinImage_Object) AutoSpinImage_Object.SetActive(true);
         if (SpinImage_Object) SpinImage_Object.SetActive(false);
-        updateAutoCount(count);
-        if (slotManager) slotManager.AutoSpin(count);
+        updateAutoCount(SpinCount);
+    }
+
+    private void StartAutoSpin()
+    {
+        ToggleButtonGrp(false);
+        if (slotManager) slotManager.AutoSpin(SpinCount);
+    }
+
+    internal void StoppingAutoSpin()
+    {
+        if (slotManager.IsAutoSpin)
+        {
+            if (StopAutoSpin_Button) StopAutoSpin_Button.interactable = false;
+            if (slotManager) slotManager.StopAutoSpin();
+        }
+        else
+        {
+            StartAutoSpin();
+        }
     }
 
     internal void updateAutoCount(int count)
@@ -138,7 +202,14 @@ public class UIManager : MonoBehaviour
     internal void ToggleButtonGrp(bool isActive)
     {
         if (Spin_Button) Spin_Button.interactable = isActive;
-        if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = isActive;
+        if (slotManager.IsAutoSpin && isActive)
+        {
+            if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = false;
+        }
+        else
+        {
+            if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = isActive;
+        }
         if (Spin_Button) Spin_Button.interactable = isActive;
     }
 }
