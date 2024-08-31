@@ -14,6 +14,8 @@ public class SlotController : MonoBehaviour
     [SerializeField]
     private Transform[] Slot_Transform;
     [SerializeField]
+    private Transform[] RedSlot_Transform;
+    [SerializeField]
     private Image[] Stop_Images;
     [SerializeField]
     private ImageAnimation[] Stop_Anims;
@@ -34,6 +36,10 @@ public class SlotController : MonoBehaviour
 
     internal bool IsSpinning = false;
     internal bool IsAutoSpin = false;
+    [SerializeField]
+    private bool IsRespin = false;
+    [SerializeField]
+    private bool IsRedRespin = false;
 
     [Header("Integers")]
     [SerializeField]
@@ -51,7 +57,7 @@ public class SlotController : MonoBehaviour
 
     internal int SlotNumber = 3;
 
-    private List<Tweener> alltweens = new List<Tweener>();
+    private List<Tweener> alltweens = new List<Tweener>(3);
 
     private Coroutine AutoSpinRoutine = null;
     private Coroutine tweenroutine = null;
@@ -128,6 +134,7 @@ public class SlotController : MonoBehaviour
     {
         IsSpinning = true;
         ResetSpin();
+        uiController.resetWinColor();
         for (int i = 0; i < SlotNumber; i++)
         {
             if (i == 1)
@@ -169,11 +176,32 @@ public class SlotController : MonoBehaviour
             if (dummyresponse[i] != -1)
             {
                 Stop_Anims[i].StartAnimation();
+                uiController.AddWinColor(i);
             }
         }
 
         yield return new WaitForSeconds(0.3f);
         KillAllTweens();
+        if(IsRespin)
+        {
+            if (uiController) uiController.GreenRespin(true);
+            yield return InitiateGreenRespin(0, false);
+            yield return InitiateGreenRespin(2, false);
+            yield return new WaitForSeconds(2f);
+            yield return StopGreenRespin(0,0);
+            yield return StopGreenRespin(2,1);
+            KillAllTweens();
+            if (uiController) uiController.GreenRespin(false);
+        }
+        if(IsRedRespin)
+        {
+            if (uiController) uiController.GreenRespin(true);
+            yield return new WaitForSeconds(1);
+            if (uiController) uiController.RedRespin(true);
+            yield return new WaitForSeconds(5);
+            if (uiController) uiController.GreenRespin(false);
+            if (uiController) uiController.RedRespin(false);
+        }
         IsSpinning = false;
         if (!IsAutoSpin)
         {
@@ -187,6 +215,19 @@ public class SlotController : MonoBehaviour
         {
             Stop_Anims[i].StopAnimation();
         }
+    }
+
+    private IEnumerator InitiateGreenRespin(int value, bool isMid)
+    {
+        Debug.Log("initiate tween");
+        InitializeGreenTweening(Slot_Transform[value], isMid);
+        yield return new WaitForSeconds(0.1f);
+    }
+
+    private IEnumerator StopGreenRespin(int value, int tweenvalue)
+    {
+        Debug.Log("stop tween");
+        yield return StopGreenTweening(5, Slot_Transform[value], tweenvalue);
     }
     #endregion
 
@@ -259,9 +300,45 @@ public class SlotController : MonoBehaviour
         }
     }
 
-    private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index,bool isMid = false)
+    private void InitializeGreenTweening(Transform slotTransform,bool IsMid = false)
     {
-        if(isMid)
+        if (IsMid)
+        {
+            slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
+            Tweener tweener = slotTransform.DOLocalMoveY(-MidtweenHeight, 0.4f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
+            tweener.Play();
+            alltweens.Add(tweener);
+        }
+        else
+        {
+            slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
+            Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.4f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
+            tweener.Play();
+            alltweens.Add(tweener);
+        }
+    }
+
+    private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isMid = false)
+    {
+        if (isMid)
+        {
+            alltweens[index].Pause();
+            int tweenpos = (reqpos * (MidIconSizeFactor + MidSpaceFactor)) - (MidIconSizeFactor + (2 * MidSpaceFactor));
+            alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (MidSpaceFactor > 0 ? MidSpaceFactor / 4 : 0), 0.5f).SetEase(Ease.OutElastic);
+            yield return new WaitForSeconds(0.5f);
+        }
+        else
+        {
+            alltweens[index].Pause();
+            int tweenpos = (reqpos * (IconSizeFactor + SpaceFactor)) - (IconSizeFactor + (2 * SpaceFactor));
+            alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (SpaceFactor > 0 ? SpaceFactor / 4 : 0), 0.5f).SetEase(Ease.OutElastic);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    private IEnumerator StopGreenTweening(int reqpos, Transform slotTransform, int index, bool isMid = false)
+    {
+        if (isMid)
         {
             alltweens[index].Pause();
             int tweenpos = (reqpos * (MidIconSizeFactor + MidSpaceFactor)) - (MidIconSizeFactor + (2 * MidSpaceFactor));
@@ -279,10 +356,14 @@ public class SlotController : MonoBehaviour
 
     private void KillAllTweens()
     {
-        for (int i = 0; i < SlotNumber; i++)
+        for (int i = 0; i < alltweens.Count; i++)
         {
-            alltweens[i].Kill();
+            if (alltweens[i] != null)
+            {
+                alltweens[i].Kill();
+            }
         }
         alltweens.Clear();
+        alltweens.TrimExcess();
     }
 }

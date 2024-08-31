@@ -150,14 +150,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4e165b06717674eb6b0d242ca94524f2
-      internalID: -518519737
+      spriteID: 792dbf9d33c0247a68fe2bd3bb1f39ed
+      internalID: 1918976285
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: innerSlider
+      name: SliderInner
       rect:
         serializedVersion: 2
         x: 1280
@@ -171,14 +171,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9dae67a36876b49c8b088f0c6dc42505
-      internalID: -226603579
+      spriteID: 1407efab76c8e4e769551d687b94489b
+      internalID: 365591315
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SliderButton
+      name: SliderHandle
       rect:
         serializedVersion: 2
         x: 1871
@@ -192,8 +192,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d7abc24f8f6b646208ab7df4fed2c81f
-      internalID: 167686054
+      spriteID: ec15324b61e624dbfbdd13340cbe944f
+      internalID: 2087162259
       vertices: []
       indices: 
       edges: []
@@ -213,8 +213,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 96e0df78192f24e008dc40a4548b497d
-      internalID: 1527853089
+      spriteID: 9b02878525f374016a404f9bb19dd1d5
+      internalID: -913359854
       vertices: []
       indices: 
       edges: []
@@ -234,8 +234,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4fbacd812d61144b8884b7888a1d2e42
-      internalID: -1394013546
+      spriteID: 0b503e08cb2894622b86e3e22a8a86a6
+      internalID: 1997518388
       vertices: []
       indices: 
       edges: []
@@ -255,8 +255,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 71ea62f1cf4574be8a007465bedda6b7
-      internalID: 1769912076
+      spriteID: 9e7bdd5dc73fc4252939b1c5a5e795af
+      internalID: -382516863
       vertices: []
       indices: 
       edges: []
@@ -272,15 +272,15 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      BG: -518519737
-      Minus: -1394013546
-      Plus: 1769912076
-      SliderButton: 167686054
-      SliderOuter: 1527853089
-      innerSlider: -226603579
-      pop up bet_0: 56185160
-      pop up bet_4: 1756554685
-      pop up bet_6: 2094590980
+      BG: 1918976285
+      Minus: 1997518388
+      Plus: -382516863
+      SliderHandle: 2087162259
+      SliderInner: 365591315
+      SliderOuter: -913359854
+      pop up bet_0: -1423620368
+      pop up bet_4: 1464818118
+      pop up bet_6: 588770795
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
