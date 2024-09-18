@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,7 +6,8 @@ using DG.Tweening;
 
 public class UIManager : MonoBehaviour
 {
-    [Header("Buttons")]
+    #region References
+    [Header("Main Buttons")]
     [SerializeField]
     private Button Spin_Button;
     [SerializeField]
@@ -15,19 +15,23 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Button AutoSpinPanel_Button;
     [SerializeField]
-    private Button Menu_Button;
+    private Button GameExit_Button;
+
+    [Header("Main Texts")]
+    [SerializeField]
+    private TMP_Text BalanceMain_Text;
+    [SerializeField]
+    private TMP_Text BetMain_Text;
+    [SerializeField]
+    private TMP_Text WinMain_Text;
+
+    [Header("AutoSpin Panel")]
     [SerializeField]
     private GameObject AT_GameObject;
     [SerializeField]
     private RectTransform AT_Transform;
     [SerializeField]
-    private Button RayCast_Button;
-    [SerializeField]
-    private GameObject RayCast_Object;
-    [SerializeField]
     private Transform AT_ImageTransform;
-    [SerializeField]
-    private SlotController slotManager;
     [SerializeField]
     private Button[] AutoCount_Buttons;
     [SerializeField]
@@ -36,7 +40,15 @@ public class UIManager : MonoBehaviour
     private GameObject AutoSpinImage_Object;
     [SerializeField]
     private TMP_Text AutoCounter_Text;
+
+    [Header("Screen Raycast")]
     [SerializeField]
+    private Button RayCast_Button;
+    [SerializeField]
+    private GameObject RayCast_Object;
+    [SerializeField]
+
+    [Header("Bet Popup")]
     private GameObject BetPanel_Object;
     [SerializeField]
     private Button Bet_Button;
@@ -56,12 +68,18 @@ public class UIManager : MonoBehaviour
     private Button Denomplus_Button;
     [SerializeField]
     private Button Denomminus_Button;
+
+    [Header("Slots BackGround")]
     [SerializeField]
     private Image[] Slots_image;
     [SerializeField]
     private Color Disabled_Color;
     [SerializeField]
     private Color Win_Color;
+
+    [Header("Menu Setup")]
+    [SerializeField]
+    private Button Menu_Button;
     [SerializeField]
     private Button Sound_Button;
     [SerializeField]
@@ -76,38 +94,96 @@ public class UIManager : MonoBehaviour
     private RectTransform MenuButtons_Rect;
     [SerializeField]
     private GameObject MenuButton_Object;
+
+    [Header("TitleSettings")]
     [SerializeField]
     private GameObject CMHeading_object;
     [SerializeField]
     private GameObject RespinHeading_object;
+
+    [Header("Red UI Setup")]
     [SerializeField]
     private GameObject RedSpinSetup;
+
+    [Header("RulesPopup")]
     [SerializeField]
     private GameObject RulesPopup;
     [SerializeField]
+    private Button CloseRules_Button;
+
+    [Header("AutSpinPopup")]
+    [SerializeField]
     private GameObject AutoSpinPopup;
+    [SerializeField]
+    private Button CloseAutoPopup_Button;
+    [SerializeField]
+    private Slider AutoSpin_Slider;
+    [SerializeField]
+    private TMP_Text AutoSpinSetup_Text;
+    [SerializeField]
+    private Button AutoSpinPlus_Button;
+    [SerializeField]
+    private Button AutoSpinMinus_Button;
+
+    [Header("Win Popup")]
+    [SerializeField]
+    private GameObject NiceWinPopup;
+
+    [Header("Exit Popup")]
+    [SerializeField]
+    private GameObject ExitPopup_Object;
+    [SerializeField]
+    private Button YesExit_Button;
+    [SerializeField]
+    private Button NoExit_Button;
+    [SerializeField]
+    private Button CloseExitButton;
+
+    [Header("Low Balance Popup")]
+    [SerializeField]
+    private GameObject LBPopup_Object;
+    [SerializeField]
+    private Button CloseLB_Button;
+
+    [Header("Disconnection Popup")]
+    [SerializeField]
+    private GameObject DisconnectionPopup_Object;
+    [SerializeField]
+    private Button CloseDisconnect_Button;
+
+    [Header("Audio Setup")]
     [SerializeField]
     private GameObject Mute_Object;
     [SerializeField]
     private GameObject Sound_Object;
-    [SerializeField]
-    private Button CloseRules_Button;
-    [SerializeField]
-    private Button CloseAutoPopup_Button;
+
+    [Header("Main Popup BG")]
     [SerializeField]
     private GameObject PopupMain_Object;
 
+    [Header("Controllers")]
+    [SerializeField]
+    private SlotController slotManager;
+    #endregion
+
     private int SpinCount = 0;
+    private int currentBet = 0;
     private bool isAtOpen = false;
     private bool isBetOpen = false;
     private bool isMenuOpen = false;
+    private bool isExit = false;
 
     private void Start()
     {
         isAtOpen = false;
         isBetOpen = false;
         isMenuOpen = false;
+        Initialisation();
+    }
 
+    #region Initial Setup
+    private void Initialisation()
+    {
         if (Spin_Button) Spin_Button.onClick.RemoveAllListeners();
         if (Spin_Button) Spin_Button.onClick.AddListener(StartSpinning);
 
@@ -165,9 +241,33 @@ public class UIManager : MonoBehaviour
         if (CloseAutoPopup_Button) CloseAutoPopup_Button.onClick.RemoveAllListeners();
         if (CloseAutoPopup_Button) CloseAutoPopup_Button.onClick.AddListener(CloseSettingsPopup);
 
+        if (AutoSpin_Slider) AutoSpin_Slider.onValueChanged.RemoveAllListeners();
+        if (AutoSpin_Slider) AutoSpin_Slider.onValueChanged.AddListener(OnATSlide);
+
+        if (AutoSpinPlus_Button) AutoSpinPlus_Button.onClick.RemoveAllListeners();
+        if (AutoSpinPlus_Button) AutoSpinPlus_Button.onClick.AddListener(delegate { ToggleAutoSpin(true); });
+
+        if (AutoSpinMinus_Button) AutoSpinMinus_Button.onClick.RemoveAllListeners();
+        if (AutoSpinMinus_Button) AutoSpinMinus_Button.onClick.AddListener(delegate { ToggleAutoSpin(false); });
+
+        if (GameExit_Button) GameExit_Button.onClick.RemoveAllListeners();
+        if (GameExit_Button) GameExit_Button.onClick.AddListener(delegate { TogglePopup(ExitPopup_Object, true); });
+
+        if (CloseExitButton) CloseExitButton.onClick.RemoveAllListeners();
+        if (CloseExitButton) CloseExitButton.onClick.AddListener(delegate { if (!isExit) TogglePopup(ExitPopup_Object); });
+
+        if (NoExit_Button) NoExit_Button.onClick.RemoveAllListeners();
+        if (NoExit_Button) NoExit_Button.onClick.AddListener(delegate { if (!isExit) TogglePopup(ExitPopup_Object); });
+
+        if (YesExit_Button) YesExit_Button.onClick.RemoveAllListeners();
+        if (YesExit_Button) YesExit_Button.onClick.AddListener(CallOnExitFunction);
+
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.RemoveAllListeners();
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(CallOnExitFunction);
+
         for (int i = 0; i < AutoCount_Buttons.Length; i++)
         {
-            switch(i)
+            switch (i)
             {
                 case 0:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
@@ -191,7 +291,10 @@ public class UIManager : MonoBehaviour
                     break;
             }
         }
+
+        if (BetMain_Text) BetMain_Text.text = "10.00";
     }
+    #endregion
 
     private void StartSpinning()
     {
@@ -226,6 +329,7 @@ public class UIManager : MonoBehaviour
             OnMenuClick();
         }
     }
+
 
     #region AutoSpin
     private void OnATClick()
@@ -312,23 +416,28 @@ public class UIManager : MonoBehaviour
             case 0:
                 myvalue = 1;
                 if (slotManager) slotManager.SlotNumber = 1;
+                if (slotManager) slotManager.BetCounter = 0;
                 if (Slots_image[1]) Slots_image[1].color = Disabled_Color;
                 if (Slots_image[2]) Slots_image[2].color = Disabled_Color;
                 break;
             case 1:
                 myvalue = 5;
                 if (slotManager) slotManager.SlotNumber = 2;
+                if (slotManager) slotManager.BetCounter = 1;
                 if (Slots_image[1]) Slots_image[1].color = Color.white;
                 if (Slots_image[2]) Slots_image[2].color = Disabled_Color;
                 break;
             case 2:
                 myvalue = 10;
                 if (slotManager) slotManager.SlotNumber = 3;
+                if (slotManager) slotManager.BetCounter = 2;
                 if (Slots_image[1]) Slots_image[1].color = Color.white;
                 if (Slots_image[2]) Slots_image[2].color = Color.white;
                 break;
         }
+        currentBet = myvalue;
         if (Bet_Text) Bet_Text.text = myvalue.ToString();
+        if (BetMain_Text) BetMain_Text.text = myvalue.ToString("f2");
     }
 
     private void OnDenomChange(float value)
@@ -383,6 +492,7 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 
+    #region MenuSettup
     private void OnMenuClick()
     {
         if (!isMenuOpen)
@@ -451,6 +561,65 @@ public class UIManager : MonoBehaviour
         if (AutoSpinPopup) AutoSpinPopup.SetActive(false);
     }
 
+    private void OnATSlide(float value)
+    {
+        if (AutoSpinSetup_Text) AutoSpinSetup_Text.text = value.ToString();
+        if (value > 0)
+        {
+            SpinCount = (int)value;
+            if (StopAutoSpin_Button) StopAutoSpin_Button.interactable = true;
+            if (AutoSpinImage_Object) AutoSpinImage_Object.SetActive(true);
+            if (SpinImage_Object) SpinImage_Object.SetActive(false);
+            updateAutoCount(SpinCount);
+        }
+        else
+        {
+            SpinCount = (int)value;
+            if (StopAutoSpin_Button) StopAutoSpin_Button.interactable = false;
+            if (AutoSpinImage_Object) AutoSpinImage_Object.SetActive(false);
+            if (SpinImage_Object) SpinImage_Object.SetActive(true);
+            updateAutoCount(SpinCount);
+        }
+    }
+
+    private void ToggleAutoSpin(bool isIncrement)
+    {
+        if (isIncrement) 
+        {
+            if (AutoSpin_Slider) AutoSpin_Slider.value++;
+        }
+        else
+        {
+            if (AutoSpin_Slider) AutoSpin_Slider.value--;
+        }
+    }
+    #endregion
+
+    #region WinPopup
+    private void ToggleWinPopup(bool isActive)
+    {
+        if (PopupMain_Object) PopupMain_Object.SetActive(isActive);
+        if (NiceWinPopup) NiceWinPopup.SetActive(isActive);
+    }
+
+    #endregion
+
+    #region Miscellanious Popups
+    private void TogglePopup(GameObject popup, bool isActive = false)
+    {
+        if (PopupMain_Object) PopupMain_Object.SetActive(isActive);
+        if (popup) popup.SetActive(isActive);
+    }
+
+    private void CallOnExitFunction()
+    {
+        isExit = true;
+        //audioController.PlayButtonAudio();
+        slotManager.CallCloseSocket();
+    }
+
+    #endregion
+
     #region InternalMethods
     internal void StoppingAutoSpin()
     {
@@ -481,6 +650,8 @@ public class UIManager : MonoBehaviour
         {
             i.color = Color.white;
         }
+
+        if (WinMain_Text) WinMain_Text.text = "0.00";
     }
 
     internal void StopAutoSpin()
@@ -540,6 +711,74 @@ public class UIManager : MonoBehaviour
             if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = isActive;
         }
         if (Spin_Button) Spin_Button.interactable = isActive;
+        if (Bet_Button) Bet_Button.interactable = isActive;
+    }
+
+    internal void UpdateBalance(double balance)
+    {
+        if (BalanceMain_Text) BalanceMain_Text.text = balance.ToString("f2");
+    }
+
+    internal IEnumerator UpdateWinnings(double balance, double winning)
+    {
+        bool isComplete = false;
+        double prevBalance = double.Parse(BalanceMain_Text.text);
+        double prevWinning = 0f;
+        DOTween.To(() => prevBalance, (val) => prevBalance = val, balance, 5f).OnUpdate(() =>
+        {
+            if (BalanceMain_Text) BalanceMain_Text.text = prevBalance.ToString("f2");
+        });
+
+        DOTween.To(() => prevWinning, (val) => prevWinning = val, winning, 5f).OnUpdate(() =>
+        {
+            if (WinMain_Text) WinMain_Text.text = prevWinning.ToString("f2");
+        }).OnComplete(delegate { isComplete = true; });
+
+        if (winning > currentBet * 5)
+        {
+            ToggleWinPopup(true);
+            yield return new WaitForSecondsRealtime(5.5f);
+            ToggleWinPopup(false);
+        }
+
+        yield return new WaitUntil(() => isComplete);
+    }
+
+    internal void UpdateTweenBalance(double bet)
+    {
+        double prevBalance = double.Parse(BalanceMain_Text.text);
+        double currentBalance = prevBalance - bet;
+        DOTween.To(() => prevBalance, (val) => prevBalance = val, currentBalance, 1f).OnUpdate(() =>
+        {
+            if (BalanceMain_Text) BalanceMain_Text.text = prevBalance.ToString("f2");
+        });
+    }
+
+    internal void EnableLowBalance()
+    {
+        TogglePopup(LBPopup_Object, true);
+    }
+
+    internal void EnableDisconect()
+    {
+        if (!isExit)
+        {
+            TogglePopup(DisconnectionPopup_Object, true);
+        }
+    }
+
+    internal bool CheckBalance(double bet)
+    {
+        double prevBalance = double.Parse(BalanceMain_Text.text);
+        double currentBalance = prevBalance - bet;
+        if (currentBalance < 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     #endregion
 }
