@@ -164,6 +164,8 @@ public class UIManager : MonoBehaviour
     [Header("Controllers")]
     [SerializeField]
     private SlotController slotManager;
+    [SerializeField]
+    private AudioController audioController;
     #endregion
 
     private int SpinCount = 0;
@@ -185,19 +187,19 @@ public class UIManager : MonoBehaviour
     private void Initialisation()
     {
         if (Spin_Button) Spin_Button.onClick.RemoveAllListeners();
-        if (Spin_Button) Spin_Button.onClick.AddListener(StartSpinning);
+        if (Spin_Button) Spin_Button.onClick.AddListener(delegate { audioController.PlaySpinButtonAudio(); StartSpinning(); });
 
         if (AutoSpinPanel_Button) AutoSpinPanel_Button.onClick.RemoveAllListeners();
-        if (AutoSpinPanel_Button) AutoSpinPanel_Button.onClick.AddListener(OnATClick);
+        if (AutoSpinPanel_Button) AutoSpinPanel_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnATClick(); });
 
         if (RayCast_Button) RayCast_Button.onClick.RemoveAllListeners();
-        if (RayCast_Button) RayCast_Button.onClick.AddListener(OnRayCastClick);
+        if (RayCast_Button) RayCast_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnRayCastClick(); });
 
         if (StopAutoSpin_Button) StopAutoSpin_Button.onClick.RemoveAllListeners();
-        if (StopAutoSpin_Button) StopAutoSpin_Button.onClick.AddListener(StoppingAutoSpin);
+        if (StopAutoSpin_Button) StopAutoSpin_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); StoppingAutoSpin(); });
 
         if (Bet_Button) Bet_Button.onClick.RemoveAllListeners();
-        if (Bet_Button) Bet_Button.onClick.AddListener(OnBetClick);
+        if (Bet_Button) Bet_Button.onClick.AddListener(delegate { OnBetClick(); audioController.PlayButtonAudio(); });
 
         if (Bet_Slider) Bet_Slider.onValueChanged.RemoveAllListeners();
         if (Bet_Slider) Bet_Slider.onValueChanged.AddListener(OnBetChange);
@@ -206,64 +208,64 @@ public class UIManager : MonoBehaviour
         if (Denom_Slider) Denom_Slider.onValueChanged.AddListener(OnDenomChange);
 
         if (Betplus_Button) Betplus_Button.onClick.RemoveAllListeners();
-        if (Betplus_Button) Betplus_Button.onClick.AddListener(delegate { OnBetButton(true); });
+        if (Betplus_Button) Betplus_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnBetButton(true); });
 
         if (Betminus_Button) Betminus_Button.onClick.RemoveAllListeners();
-        if (Betminus_Button) Betminus_Button.onClick.AddListener(delegate { OnBetButton(false); });
+        if (Betminus_Button) Betminus_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnBetButton(false); });
 
         if (Denomplus_Button) Denomplus_Button.onClick.RemoveAllListeners();
-        if (Denomplus_Button) Denomplus_Button.onClick.AddListener(delegate { OnDenomButton(true); });
+        if (Denomplus_Button) Denomplus_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnDenomButton(true); });
 
         if (Denomminus_Button) Denomminus_Button.onClick.RemoveAllListeners();
-        if (Denomminus_Button) Denomminus_Button.onClick.AddListener(delegate { OnDenomButton(false); });
+        if (Denomminus_Button) Denomminus_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnDenomButton(false); });
 
         if (Menu_Button) Menu_Button.onClick.RemoveAllListeners();
-        if (Menu_Button) Menu_Button.onClick.AddListener(OnMenuClick);
+        if (Menu_Button) Menu_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnMenuClick(); });
 
         if (Mute_Button) Mute_Button.onClick.RemoveAllListeners();
-        if (Mute_Button) Mute_Button.onClick.AddListener(delegate { ToggleSound(false); });
+        if (Mute_Button) Mute_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); ToggleSound(false); });
 
         if (Sound_Button) Sound_Button.onClick.RemoveAllListeners();
-        if (Sound_Button) Sound_Button.onClick.AddListener(delegate { ToggleSound(true); });
+        if (Sound_Button) Sound_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); ToggleSound(true); });
 
         if (BetSettings_Button) BetSettings_Button.onClick.RemoveAllListeners();
-        if (BetSettings_Button) BetSettings_Button.onClick.AddListener(OnBetClick);
+        if (BetSettings_Button) BetSettings_Button.onClick.AddListener(delegate{ audioController.PlayButtonAudio(); OnBetClick(); });
 
         if (Rules_Button) Rules_Button.onClick.RemoveAllListeners();
-        if (Rules_Button) Rules_Button.onClick.AddListener(OpenRulesPopup);
+        if (Rules_Button) Rules_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OpenRulesPopup(); });
 
         if (Settings_Button) Settings_Button.onClick.RemoveAllListeners();
-        if (Settings_Button) Settings_Button.onClick.AddListener(OpenSettingsPopup);
+        if (Settings_Button) Settings_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OpenSettingsPopup(); });
 
         if (CloseRules_Button) CloseRules_Button.onClick.RemoveAllListeners();
-        if (CloseRules_Button) CloseRules_Button.onClick.AddListener(CloseRulesPopup);
+        if (CloseRules_Button) CloseRules_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CloseRulesPopup(); });
 
         if (CloseAutoPopup_Button) CloseAutoPopup_Button.onClick.RemoveAllListeners();
-        if (CloseAutoPopup_Button) CloseAutoPopup_Button.onClick.AddListener(CloseSettingsPopup);
+        if (CloseAutoPopup_Button) CloseAutoPopup_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CloseSettingsPopup(); });
 
         if (AutoSpin_Slider) AutoSpin_Slider.onValueChanged.RemoveAllListeners();
         if (AutoSpin_Slider) AutoSpin_Slider.onValueChanged.AddListener(OnATSlide);
 
         if (AutoSpinPlus_Button) AutoSpinPlus_Button.onClick.RemoveAllListeners();
-        if (AutoSpinPlus_Button) AutoSpinPlus_Button.onClick.AddListener(delegate { ToggleAutoSpin(true); });
+        if (AutoSpinPlus_Button) AutoSpinPlus_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); ToggleAutoSpin(true); });
 
         if (AutoSpinMinus_Button) AutoSpinMinus_Button.onClick.RemoveAllListeners();
-        if (AutoSpinMinus_Button) AutoSpinMinus_Button.onClick.AddListener(delegate { ToggleAutoSpin(false); });
+        if (AutoSpinMinus_Button) AutoSpinMinus_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); ToggleAutoSpin(false); });
 
         if (GameExit_Button) GameExit_Button.onClick.RemoveAllListeners();
-        if (GameExit_Button) GameExit_Button.onClick.AddListener(delegate { TogglePopup(ExitPopup_Object, true); });
+        if (GameExit_Button) GameExit_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); TogglePopup(ExitPopup_Object, true); });
 
         if (CloseExitButton) CloseExitButton.onClick.RemoveAllListeners();
-        if (CloseExitButton) CloseExitButton.onClick.AddListener(delegate { if (!isExit) TogglePopup(ExitPopup_Object); });
+        if (CloseExitButton) CloseExitButton.onClick.AddListener(delegate { audioController.PlayButtonAudio(); if (!isExit) TogglePopup(ExitPopup_Object); });
 
         if (NoExit_Button) NoExit_Button.onClick.RemoveAllListeners();
-        if (NoExit_Button) NoExit_Button.onClick.AddListener(delegate { if (!isExit) TogglePopup(ExitPopup_Object); });
+        if (NoExit_Button) NoExit_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); if (!isExit) TogglePopup(ExitPopup_Object); });
 
         if (YesExit_Button) YesExit_Button.onClick.RemoveAllListeners();
-        if (YesExit_Button) YesExit_Button.onClick.AddListener(CallOnExitFunction);
+        if (YesExit_Button) YesExit_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CallOnExitFunction(); });
 
         if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.RemoveAllListeners();
-        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(CallOnExitFunction);
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CallOnExitFunction(); });
 
         for (int i = 0; i < AutoCount_Buttons.Length; i++)
         {
@@ -271,23 +273,23 @@ public class UIManager : MonoBehaviour
             {
                 case 0:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(OnATClick);
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { audioController.PlayButtonAudio(); OnATClick(); OnATSlide(0); });
                     break;
                 case 1:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(10); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { audioController.PlayButtonAudio(); ChangeAutoView(10); OnATClick(); });
                     break;
                 case 2:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(25); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { audioController.PlayButtonAudio(); ChangeAutoView(25); OnATClick(); });
                     break;
                 case 3:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(50); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { audioController.PlayButtonAudio(); ChangeAutoView(50); OnATClick(); });
                     break;
                 case 4:
                     if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.RemoveAllListeners();
-                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { ChangeAutoView(100); OnATClick(); });
+                    if (AutoCount_Buttons[i]) AutoCount_Buttons[i].onClick.AddListener(delegate { audioController.PlayButtonAudio(); ChangeAutoView(100); OnATClick(); });
                     break;
             }
         }
@@ -533,6 +535,7 @@ public class UIManager : MonoBehaviour
             if (Mute_Object) Mute_Object.SetActive(false);
             if (Sound_Object) Sound_Object.SetActive(true);
         }
+        if (audioController) audioController.ToggleMute(isActive);
     }
 
     private void OpenRulesPopup()
@@ -646,9 +649,9 @@ public class UIManager : MonoBehaviour
 
     internal void resetWinColor()
     {
-        foreach(Image i in Slots_image)
+        for (int i = 0; i < slotManager.SlotNumber; i++) 
         {
-            i.color = Color.white;
+            Slots_image[i].color = Color.white;
         }
 
         if (WinMain_Text) WinMain_Text.text = "0.00";
@@ -737,6 +740,7 @@ public class UIManager : MonoBehaviour
         if (winning > currentBet * 5)
         {
             ToggleWinPopup(true);
+            if (audioController) audioController.PlayWLAudio("bigwin");
             yield return new WaitForSecondsRealtime(5.5f);
             ToggleWinPopup(false);
         }

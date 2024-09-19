@@ -25,7 +25,7 @@ public class SocketIOManager : MonoBehaviour
     [SerializeField]
     private string testToken;
 
-    protected string gameID = "";
+    protected string gameID = "SL-CM";
 
     internal bool SetInit = false;
 
