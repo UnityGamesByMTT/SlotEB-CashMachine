@@ -645,5 +645,10 @@ public class SlotController : MonoBehaviour
         if (uiController) uiController.EnableDisconect();
     }
 
+    internal void PopulateSymbols(Paylines paylines)
+    {
+        uiController.PopulateSymbolsPayout(paylines);
+    }
+
     #endregion
 }

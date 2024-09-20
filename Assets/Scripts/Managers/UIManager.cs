@@ -112,6 +112,10 @@ public class UIManager : MonoBehaviour
     private GameObject RulesPopup;
     [SerializeField]
     private Button CloseRules_Button;
+    [SerializeField]
+    private TMP_Text ZeroSpin_Text;
+    [SerializeField]
+    private TMP_Text RedSpin_Text;
 
     [Header("AutSpinPopup")]
     [SerializeField]
@@ -297,6 +301,21 @@ public class UIManager : MonoBehaviour
         }
 
         if (BetMain_Text) BetMain_Text.text = "10.00";
+    }
+
+    internal void PopulateSymbolsPayout(Paylines paylines)
+    {
+        for (int i = 0; i < paylines.symbols.Count; i++)
+        {
+            if (paylines.symbols[i].Name.ToUpper() == "REDRESPIN")
+            {
+                if (RedSpin_Text) RedSpin_Text.text = paylines.symbols[i].description.ToString();
+            }
+            if (paylines.symbols[i].Name.ToUpper() == "ZERORESPIN")
+            {
+                if (ZeroSpin_Text) ZeroSpin_Text.text = paylines.symbols[i].description.ToString();
+            }
+        }
     }
     #endregion
 

@@ -21230,6 +21230,8 @@ MonoBehaviour:
   RedSpinSetup: {fileID: 1882997936}
   RulesPopup: {fileID: 1023456358}
   CloseRules_Button: {fileID: 1915013779}
+  ZeroSpin_Text: {fileID: 1544567362}
+  RedSpin_Text: {fileID: 1246875042}
   AutoSpinPopup: {fileID: 103253977}
   CloseAutoPopup_Button: {fileID: 1618016233}
   AutoSpin_Slider: {fileID: 129759558}

@@ -242,6 +242,7 @@ public class SocketIOManager : MonoBehaviour
                     {
                         Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
                         Bets = myData.message.GameData.Bets;
+                        SlotManager.PopulateSymbols(myData.message.UIData.paylines);
                         SetInit = true;
                     }
                     break;
