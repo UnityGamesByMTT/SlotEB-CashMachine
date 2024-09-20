@@ -11,7 +11,7 @@ public class SlotController : MonoBehaviour
     [SerializeField]
     private Sprite[] Slot_Sprites;
     [SerializeField]
-    private Transform[] Slot_Transform;
+    internal Transform[] Slot_Transform;
     [SerializeField]
     private Image[] Stop_Images;
     [SerializeField]
@@ -19,7 +19,7 @@ public class SlotController : MonoBehaviour
     [SerializeField]
     private Sprite[] RedSlot_Sprites;
     [SerializeField]
-    private Transform[] RedSlot_Transform;
+    internal Transform[] RedSlot_Transform;
     [SerializeField]
     private Image[] RedStop_Images;
     [SerializeField]
@@ -173,12 +173,12 @@ public class SlotController : MonoBehaviour
         {
             if (i == 1)
             {
-                InitializeTweening(Slot_Transform[i],1, true);
+                InitializeTweening(Slot_Transform[i], 1, false, true);
                 yield return new WaitForSeconds(0.1f);
             }
             else
             {
-                InitializeTweening(Slot_Transform[i],1);
+                InitializeTweening(Slot_Transform[i], 1, false);
                 yield return new WaitForSeconds(0.1f);
             }
         }
@@ -195,11 +195,11 @@ public class SlotController : MonoBehaviour
         {
             if (i == 1)
             {
-                yield return StopTweening(5, Slot_Transform[i], i, 1, socketManager.TempResultData.resultSymbols[0][i], true);
+                yield return StopTweening(5, Slot_Transform[i], i, 1, socketManager.TempResultData.resultSymbols[0][i], false, true);
             }
             else
             {
-                yield return StopTweening(5, Slot_Transform[i], i, 1, socketManager.TempResultData.resultSymbols[0][i]);
+                yield return StopTweening(5, Slot_Transform[i], i, 1, socketManager.TempResultData.resultSymbols[0][i], false);
             }
         }
         StartNormalAnimation(0);
@@ -216,6 +216,10 @@ public class SlotController : MonoBehaviour
         if (socketManager.playerdata.currentWining > 0)
         {
             yield return uiController.UpdateWinnings(socketManager.playerdata.Balance, socketManager.playerdata.currentWining);
+        }
+        else
+        {
+            uiController.ResetWinText();
         }
         KillAllTweens();
         IsSpinning = false;
@@ -286,13 +290,13 @@ public class SlotController : MonoBehaviour
 
     private IEnumerator InitiateGreenRespin(int value, bool isMid)
     {
-        InitializeTweening(Slot_Transform[value], 1, isMid);
+        InitializeTweening(Slot_Transform[value], 1, true, isMid);
         yield return new WaitForSeconds(0.1f);
     }
 
     private IEnumerator StopGreenRespin(int value, int tweenvalue, int isMoney, bool isMid)
     {
-        yield return StopTweening(5, Slot_Transform[value], tweenvalue, 1, isMoney, isMid);
+        yield return StopTweening(5, Slot_Transform[value], tweenvalue, 1, isMoney, true, isMid);
     }
     #endregion
 
@@ -350,13 +354,13 @@ public class SlotController : MonoBehaviour
 
     private IEnumerator InitiateRedRespin(int value, bool isMid)
     {
-        InitializeTweening(RedSlot_Transform[value], 1, isMid);
+        InitializeTweening(RedSlot_Transform[value], 1, false, isMid);
         yield return new WaitForSeconds(0.1f);
     }
 
     private IEnumerator StopRedRespin(int value, int tweenvalue, int isMoney, bool isMid)
     {
-        yield return StopTweening(5, RedSlot_Transform[value], tweenvalue, 1, isMoney, isMid);
+        yield return StopTweening(5, RedSlot_Transform[value], tweenvalue, 1, isMoney, false, isMid);
         for (int i = 0; i < SlotNumber; i++)
         {
             if (socketManager.TempResultData.resultSymbols[1][i] != 0)
@@ -509,7 +513,7 @@ public class SlotController : MonoBehaviour
         StopImage.sprite = RedSlot_Sprites[val];
     }
 
-    private void InitializeTweening(Transform slotTransform, int type, bool IsMid = false)
+    private void InitializeTweening(Transform slotTransform, int type, bool isGreen, bool IsMid = false)
     {
         int myTweenHeight = 0;
         if (IsMid)
@@ -520,9 +524,17 @@ public class SlotController : MonoBehaviour
         {
             myTweenHeight = tweenHeight;
         }
-
-        slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-        Tweener tweener = slotTransform.DOLocalMoveY(-myTweenHeight, 1f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
+        Tweener tweener = null;
+        if (!isGreen)
+        {
+            slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
+            tweener = slotTransform.DOLocalMoveY(-myTweenHeight, 1f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
+        }
+        else
+        {
+            slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -myTweenHeight);
+            tweener = slotTransform.DOLocalMoveY(0, 1f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
+        }
         tweener.Play();
 
         if (type == 1)
@@ -535,19 +547,22 @@ public class SlotController : MonoBehaviour
         }    
     }
 
-    private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, int type, int isMoney, bool isMid = false)
+    private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, int type, int isMoney, bool isGreen, bool isMid = false)
     {
+        int myTweenHeight = 0;
         int mySizeFactor = 0;
         int mySpaceFactor = 0;
         if (isMid)
         {
             mySizeFactor = MidIconSizeFactor;
             mySpaceFactor = MidSpaceFactor;
+            myTweenHeight = MidtweenHeight;
         }
         else
         {
             mySizeFactor = IconSizeFactor;
             mySpaceFactor = SpaceFactor;
+            myTweenHeight = tweenHeight;
         }
         if (type == 1)
         {
@@ -556,7 +571,15 @@ public class SlotController : MonoBehaviour
             yield return new WaitUntil(() => IsRegister);
             alltweens[index].Kill();
             int tweenpos = (reqpos * (mySizeFactor + mySpaceFactor)) - (mySizeFactor + (2 * mySpaceFactor));
-            alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (mySpaceFactor > 0 ? mySpaceFactor / 4 : 0), 0.7f).SetEase(Ease.OutBounce);
+            if (!isGreen)
+            {
+                alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (mySpaceFactor > 0 ? mySpaceFactor / 4 : 0), 0.7f).SetEase(Ease.OutBounce);
+            }
+            else
+            {
+                slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -myTweenHeight);
+                alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100, 1f);
+            }
             yield return alltweens[index].WaitForCompletion();
             alltweens[index].Kill();
         }
@@ -620,6 +643,11 @@ public class SlotController : MonoBehaviour
     internal void DisconnectionPopup()
     {
         if (uiController) uiController.EnableDisconect();
+    }
+
+    internal void PopulateSymbols(Paylines paylines)
+    {
+        uiController.PopulateSymbolsPayout(paylines);
     }
 
     #endregion

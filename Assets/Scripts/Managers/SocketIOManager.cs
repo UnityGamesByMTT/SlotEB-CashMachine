@@ -19,7 +19,7 @@ public class SocketIOManager : MonoBehaviour
     private SlotController SlotManager;
 
     protected string SocketURI = null;
-    protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/";
+    protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
     //protected string TestSocketURI = "https://7p68wzhv-5000.inc1.devtunnels.ms/";
 
     [SerializeField]
@@ -242,6 +242,7 @@ public class SocketIOManager : MonoBehaviour
                     {
                         Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
                         Bets = myData.message.GameData.Bets;
+                        SlotManager.PopulateSymbols(myData.message.UIData.paylines);
                         SetInit = true;
                     }
                     break;

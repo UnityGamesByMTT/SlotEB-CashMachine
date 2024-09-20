@@ -61,6 +61,7 @@ public class Symbol
     public double ID { get; set; }
     public string Name { get; set; }
     public object payout { get; set; }
+    public object description { get; set; }
 }
 
 public class UIData
