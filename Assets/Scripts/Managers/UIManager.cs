@@ -24,6 +24,8 @@ public class UIManager : MonoBehaviour
     private TMP_Text BetMain_Text;
     [SerializeField]
     private TMP_Text WinMain_Text;
+    [SerializeField]
+    private TMP_Text Message_Text;
 
     [Header("AutoSpin Panel")]
     [SerializeField]
@@ -413,12 +415,24 @@ public class UIManager : MonoBehaviour
     private void OnBetChange(float value)
     {
         int myvalue = 0;
+        foreach (Transform t in slotManager.Slot_Transform)
+        {
+            t.gameObject.SetActive(true);
+        }
+        foreach (Transform t in slotManager.RedSlot_Transform)
+        {
+            t.gameObject.SetActive(true);
+        }
         switch (value)
         {
             case 0:
                 myvalue = 1;
                 if (slotManager) slotManager.SlotNumber = 1;
                 if (slotManager) slotManager.BetCounter = 0;
+                slotManager.Slot_Transform[2].gameObject.SetActive(false);
+                slotManager.Slot_Transform[1].gameObject.SetActive(false);
+                slotManager.RedSlot_Transform[2].gameObject.SetActive(false);
+                slotManager.RedSlot_Transform[1].gameObject.SetActive(false);
                 if (Slots_image[1]) Slots_image[1].color = Disabled_Color;
                 if (Slots_image[2]) Slots_image[2].color = Disabled_Color;
                 break;
@@ -426,6 +440,8 @@ public class UIManager : MonoBehaviour
                 myvalue = 5;
                 if (slotManager) slotManager.SlotNumber = 2;
                 if (slotManager) slotManager.BetCounter = 1;
+                slotManager.Slot_Transform[2].gameObject.SetActive(false);
+                slotManager.RedSlot_Transform[2].gameObject.SetActive(false);
                 if (Slots_image[1]) Slots_image[1].color = Color.white;
                 if (Slots_image[2]) Slots_image[2].color = Disabled_Color;
                 break;
@@ -653,8 +669,6 @@ public class UIManager : MonoBehaviour
         {
             Slots_image[i].color = Color.white;
         }
-
-        if (WinMain_Text) WinMain_Text.text = "0.00";
     }
 
     internal void StopAutoSpin()
@@ -667,6 +681,7 @@ public class UIManager : MonoBehaviour
     {
         if(isActice)
         {
+            UpdateMessageText("Respin");
             if (CMHeading_object) CMHeading_object.SetActive(false);
             if (RespinHeading_object) RespinHeading_object.SetActive(true);
         }
@@ -691,6 +706,7 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator RedRespinRoutine()
     {
+        UpdateMessageText("Respin");
         if (RedSpinSetup) RedSpinSetup.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         if (RedSpinSetup) RedSpinSetup.SetActive(false);
@@ -727,6 +743,7 @@ public class UIManager : MonoBehaviour
         bool isComplete = false;
         double prevBalance = double.Parse(BalanceMain_Text.text);
         double prevWinning = 0f;
+        UpdateMessageText("Pays " + winning);
         DOTween.To(() => prevBalance, (val) => prevBalance = val, balance, 5f).OnUpdate(() =>
         {
             if (BalanceMain_Text) BalanceMain_Text.text = prevBalance.ToString("f2");
@@ -758,6 +775,11 @@ public class UIManager : MonoBehaviour
         });
     }
 
+    internal void ResetWinText()
+    {
+        if (WinMain_Text) WinMain_Text.text = "0.00";
+    }
+
     internal void EnableLowBalance()
     {
         TogglePopup(LBPopup_Object, true);
@@ -783,6 +805,11 @@ public class UIManager : MonoBehaviour
         {
             return true;
         }
+    }
+
+    internal void UpdateMessageText(string messsage)
+    {
+        if (Message_Text) Message_Text.text = messsage;
     }
     #endregion
 }
