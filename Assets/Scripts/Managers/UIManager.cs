@@ -175,7 +175,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     private int SpinCount = 0;
-    private int currentBet = 0;
+    private int currentBet = 10;
     private bool isAtOpen = false;
     private bool isBetOpen = false;
     private bool isMenuOpen = false;
@@ -241,7 +241,7 @@ public class UIManager : MonoBehaviour
         if (Rules_Button) Rules_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OpenRulesPopup(); });
 
         if (Settings_Button) Settings_Button.onClick.RemoveAllListeners();
-        if (Settings_Button) Settings_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OpenSettingsPopup(); });
+        if (Settings_Button) Settings_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); OpenSettingsPopup(); AutoSpin_Slider.value = 0; });
 
         if (CloseRules_Button) CloseRules_Button.onClick.RemoveAllListeners();
         if (CloseRules_Button) CloseRules_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CloseRulesPopup(); });
@@ -797,6 +797,7 @@ public class UIManager : MonoBehaviour
     internal void ResetWinText()
     {
         if (WinMain_Text) WinMain_Text.text = "0.00";
+        UpdateMessageText("");
     }
 
     internal void EnableLowBalance()

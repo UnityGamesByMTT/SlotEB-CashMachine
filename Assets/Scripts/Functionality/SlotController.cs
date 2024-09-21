@@ -213,7 +213,7 @@ public class SlotController : MonoBehaviour
         {
             yield return RedSpinLogic();
         }
-        if (socketManager.playerdata.currentWining > 0)
+        if (socketManager.playerdata.currentWining > 0) 
         {
             yield return uiController.UpdateWinnings(socketManager.playerdata.Balance, socketManager.playerdata.currentWining);
         }
