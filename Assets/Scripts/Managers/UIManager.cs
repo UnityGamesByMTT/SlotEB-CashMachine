@@ -116,6 +116,8 @@ public class UIManager : MonoBehaviour
     private TMP_Text ZeroSpin_Text;
     [SerializeField]
     private TMP_Text RedSpin_Text;
+    [SerializeField]
+    private TMP_Text ReelActivation_Text;
 
     [Header("AutSpinPopup")]
     [SerializeField]
@@ -314,6 +316,10 @@ public class UIManager : MonoBehaviour
             if (paylines.symbols[i].Name.ToUpper() == "ZERORESPIN")
             {
                 if (ZeroSpin_Text) ZeroSpin_Text.text = paylines.symbols[i].description.ToString();
+            }
+            if (paylines.symbols[i].Name.ToUpper() == "REELACTIVATION")
+            {
+                if (ReelActivation_Text) ReelActivation_Text.text = paylines.symbols[i].description.ToString();
             }
         }
     }
@@ -773,11 +779,11 @@ public class UIManager : MonoBehaviour
             if (WinMain_Text) WinMain_Text.text = prevWinning.ToString("f2");
         }).OnComplete(delegate { isComplete = true; });
 
-        if (winning > currentBet * 5)
+        if (winning > (currentBet * 5)) 
         {
             ToggleWinPopup(true);
             if (audioController) audioController.PlayWLAudio("bigwin");
-            yield return new WaitForSecondsRealtime(5.5f);
+            yield return new WaitForSecondsRealtime(3.1f);
             ToggleWinPopup(false);
         }
 

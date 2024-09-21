@@ -44,7 +44,6 @@ public class AudioController : MonoBehaviour
         {
             case "bigwin":
                 index = 0;
-                audioPlayer_wl.loop = true;
                 break;
             case "win":
                 index = 1;
@@ -57,6 +56,7 @@ public class AudioController : MonoBehaviour
                 break;
             case "spin":
                 index = 4;
+                audioPlayer_wl.loop = true;
                 break;
         }
         StopWLAaudio();

@@ -425,6 +425,7 @@ public class SlotController : MonoBehaviour
     {
         animScript.textureArray.Clear();
         animScript.textureArray.TrimExcess();
+        animScript.AnimationSpeed = 8;
         switch (val)
         {
             case 1:
@@ -446,6 +447,7 @@ public class SlotController : MonoBehaviour
                 }
                 break;
             case 4:
+                animScript.AnimationSpeed = 6;
                 for (int i = 0; i < Symbol6.Length; i++)
                 {
                     animScript.textureArray.Add(Symbol6[i]);
