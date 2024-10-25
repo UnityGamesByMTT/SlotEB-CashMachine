@@ -162,6 +162,7 @@ public class SlotController : MonoBehaviour
             if (uiController) uiController.EnableLowBalance();
             StopAutoSpin();
             yield return new WaitForSeconds(1);
+            if (uiController) uiController.ToggleButtonGrp(true);
             yield break;
         }
         if (audioController) audioController.PlayWLAudio("spin");
