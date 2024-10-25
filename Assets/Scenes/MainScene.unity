@@ -6747,7 +6747,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SlotManager: {fileID: 2046803210}
-  testToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZDgzY2E2YTI3YmY5MDI0NDNlYjQ5NSIsInVzZXJuYW1lIjoiZWthbnNoIiwicm9sZSI6InBsYXllciIsImlhdCI6MTcyOTg0NjkzMiwiZXhwIjoxNzMwNDUxNzMyfQ.rNxdfS7D8d08Y1z1MzoKXoE4ToJu3yQEC3zDSjKMZ5g
+  testToken: 
 --- !u!1 &503942312
 GameObject:
   m_ObjectHideFlags: 0
