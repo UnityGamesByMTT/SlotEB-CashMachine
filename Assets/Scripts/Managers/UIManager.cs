@@ -275,6 +275,9 @@ public class UIManager : MonoBehaviour
         if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.RemoveAllListeners();
         if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CallOnExitFunction(); });
 
+        if (CloseLB_Button) CloseLB_Button.onClick.RemoveAllListeners();
+        if (CloseLB_Button) CloseLB_Button.onClick.AddListener(delegate { TogglePopup(LBPopup_Object); });
+
         for (int i = 0; i < AutoCount_Buttons.Length; i++)
         {
             switch (i)
