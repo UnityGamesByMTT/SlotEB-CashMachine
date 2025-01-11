@@ -83,6 +83,14 @@ public class SlotController : MonoBehaviour
     private AudioController audioController;
     #endregion
 
+    [Header("turbo")]
+    [SerializeField] internal bool StopSpinToggle;
+    [SerializeField] internal bool IsTurboOn;
+    private bool WasAutoSpinOn;
+    private float SpinDelay = 0.2f;
+
+   
+
     private Coroutine AutoSpinRoutine = null;
     private Coroutine tweenroutine = null;
 
@@ -147,6 +155,8 @@ public class SlotController : MonoBehaviour
             if (uiController) uiController.StopAutoSpin();
         }
     }
+
+    
     #endregion
 
     #region SpinLogic
@@ -161,9 +171,15 @@ public class SlotController : MonoBehaviour
         {
             if (uiController) uiController.EnableLowBalance();
             StopAutoSpin();
-            yield return new WaitForSeconds(1);
+
+            if (IsTurboOn) yield return new WaitForSeconds(0.2f);
+            else yield return new WaitForSeconds(2);
             if (uiController) uiController.ToggleButtonGrp(true);
             yield break;
+        }
+        if (!IsTurboOn)
+        {
+            uiController.StopSpin_Button.gameObject.SetActive(true);
         }
         if (audioController) audioController.PlayWLAudio("spin");
         IsSpinning = true;
@@ -190,8 +206,7 @@ public class SlotController : MonoBehaviour
 
         PopulateNormalSpin(0, false);
 
-        yield return new WaitForSeconds(0.5f);
-
+       
         for (int i = 0; i < SlotNumber; i++)
         {
             if (i == 1)
@@ -203,8 +218,10 @@ public class SlotController : MonoBehaviour
                 yield return StopTweening(5, Slot_Transform[i], i, 1, socketManager.TempResultData.resultSymbols[0][i], false);
             }
         }
+        StopSpinToggle = false;
         StartNormalAnimation(0);
-        yield return new WaitForSeconds(0.3f);
+        //yield return new WaitForSeconds(0.3f);
+        yield return alltweens[^1].WaitForCompletion();
         KillAllTweens();
         if (socketManager.TempResultData.hasReSpin)
         {
@@ -221,6 +238,7 @@ public class SlotController : MonoBehaviour
         else
         {
             uiController.ResetWinText();
+            yield return new WaitForSeconds(.9f);
         }
         KillAllTweens();
         IsSpinning = false;
@@ -245,7 +263,8 @@ public class SlotController : MonoBehaviour
     {
         if (uiController) uiController.GreenRespin(true);
         if (audioController) audioController.PlayWLAudio("respin");
-        yield return new WaitForSecondsRealtime(2.5f);
+        if (IsTurboOn) yield return new WaitForSecondsRealtime(0.5f);
+        else yield return new WaitForSecondsRealtime(2.5f);
         for (int len = 0; len < length - 1; len++) 
         {
             for (int i = 0; i < SlotNumber; i++)
@@ -263,7 +282,8 @@ public class SlotController : MonoBehaviour
                 }
             }
             if (audioController) audioController.PlayWLAudio("spin");
-            yield return new WaitForSeconds(2f);
+            if (IsTurboOn) yield return new WaitForSeconds(0.5f);
+            else yield return new WaitForSeconds(2f);
             PopulateNormalSpin(len + 1, false);
             int k = 0;
             for (int i = 0; i < SlotNumber; i++)
@@ -308,9 +328,11 @@ public class SlotController : MonoBehaviour
         PopulateRedSpin(0, true);
         if (audioController) audioController.PlayWLAudio("respin");
         if (uiController) uiController.GreenRespin(true);
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1);        
         if (uiController) uiController.RedRespin(true);
-        yield return new WaitForSeconds(3);
+        // yield return new WaitForSeconds(3);
+        if (IsTurboOn) yield return new WaitForSeconds(2f);
+        else yield return new WaitForSeconds(3f);
         for (int i = 0; i < SlotNumber; i++)
         {
             if (socketManager.TempResultData.resultSymbols[0][i] == 0)
@@ -326,7 +348,9 @@ public class SlotController : MonoBehaviour
             }
         }
         if (audioController) audioController.PlayWLAudio("spin");
-        yield return new WaitForSeconds(2f);
+        // yield return new WaitForSeconds(2f);
+        if (IsTurboOn) yield return new WaitForSeconds(1f);
+        else yield return new WaitForSeconds(2f);
         int k = 0;
         PopulateRedSpin(1, false);
         PopulateNormalSpin(1, true);
@@ -347,7 +371,9 @@ public class SlotController : MonoBehaviour
                 }
             }
         }
-        yield return new WaitForSeconds(2);
+        //yield return new WaitForSeconds(2);
+        if (IsTurboOn) yield return new WaitForSeconds(1f);
+        else yield return new WaitForSeconds(2f);
         KillAllRedTweens();
         if (uiController) uiController.GreenRespin(false);
         if (uiController) uiController.RedRespin(false);
@@ -569,13 +595,24 @@ public class SlotController : MonoBehaviour
         }
         if (type == 1)
         {
+            
             bool IsRegister = false;
-            yield return alltweens[index].OnStepComplete(delegate { IsRegister = true; });
-            yield return new WaitUntil(() => IsRegister);
+            if (!IsTurboOn)
+            {
+                yield return alltweens[index].OnStepComplete(delegate { IsRegister = true; });
+                yield return new WaitUntil(() => IsRegister);    
+            }     
+            else                                                             // changes
+            {
+                  yield return new WaitForSeconds(0.1f);
+                    
+            }
+            uiController.StopSpin_Button.gameObject.SetActive(false);
             alltweens[index].Kill();
             int tweenpos = (reqpos * (mySizeFactor + mySpaceFactor)) - (mySizeFactor + (2 * mySpaceFactor));
             if (!isGreen)
             {
+                slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);                                  //change
                 alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100 + (mySpaceFactor > 0 ? mySpaceFactor / 4 : 0), 0.7f).SetEase(Ease.OutBounce);
             }
             else
@@ -583,8 +620,18 @@ public class SlotController : MonoBehaviour
                 slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -myTweenHeight);
                 alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100, 1f);
             }
-            yield return alltweens[index].WaitForCompletion();
-            alltweens[index].Kill();
+
+            if (!StopSpinToggle)
+            {
+                yield return alltweens[index].WaitForCompletion();
+            }
+            else
+            {
+               
+                yield return null;
+               
+            }
+            //  alltweens[index].Kill();
         }
         else
         {
@@ -605,7 +652,7 @@ public class SlotController : MonoBehaviour
         {
             if (audioController) audioController.PlayWLAudio("win");
             uiController.AddWinColor(index);
-            yield return new WaitForSecondsRealtime(2);
+          //  yield return new WaitForSecondsRealtime(2);
         }
     }
 

@@ -16,6 +16,11 @@ public class UIManager : MonoBehaviour
     private Button AutoSpinPanel_Button;
     [SerializeField]
     private Button GameExit_Button;
+    [SerializeField]
+    private Button Turbo_Button;
+    [SerializeField]
+    internal Button StopSpin_Button;
+    private Sprite turboOriginalSprite;
 
     [Header("Main Texts")]
     [SerializeField]
@@ -136,6 +141,8 @@ public class UIManager : MonoBehaviour
     [Header("Win Popup")]
     [SerializeField]
     private GameObject NiceWinPopup;
+    [SerializeField]
+    private Button NiceWinPopupCloseBtn;
 
     [Header("Exit Popup")]
     [SerializeField]
@@ -179,7 +186,7 @@ public class UIManager : MonoBehaviour
     private int SpinCount = 0;
     private int currentBet = 10;
     private bool isAtOpen = false;
-    private bool isBetOpen = false;
+    [SerializeField]private bool isBetOpen = false;
     private bool isMenuOpen = false;
     private bool isExit = false;
 
@@ -278,6 +285,15 @@ public class UIManager : MonoBehaviour
         if (CloseLB_Button) CloseLB_Button.onClick.RemoveAllListeners();
         if (CloseLB_Button) CloseLB_Button.onClick.AddListener(delegate { TogglePopup(LBPopup_Object); });
 
+        if (StopSpin_Button) StopSpin_Button.onClick.RemoveAllListeners();
+        if (StopSpin_Button) StopSpin_Button.onClick.AddListener(() => {slotManager.StopSpinToggle = true; StopSpin_Button.gameObject.SetActive(false); if (audioController) audioController.PlayButtonAudio(); });
+
+        if (Turbo_Button) Turbo_Button.onClick.RemoveAllListeners();
+        if (Turbo_Button) Turbo_Button.onClick.AddListener(TurboToggle);
+
+        if (NiceWinPopupCloseBtn) NiceWinPopupCloseBtn.onClick.RemoveAllListeners();
+        if (NiceWinPopupCloseBtn) NiceWinPopupCloseBtn.onClick.AddListener(delegate { ToggleWinPopup(false); });
+
         for (int i = 0; i < AutoCount_Buttons.Length; i++)
         {
             switch (i)
@@ -306,6 +322,7 @@ public class UIManager : MonoBehaviour
         }
 
         if (BetMain_Text) BetMain_Text.text = "10.00";
+        turboOriginalSprite = Turbo_Button.GetComponent<Image>().sprite;
     }
 
     internal void PopulateSymbolsPayout(Paylines paylines)
@@ -343,6 +360,7 @@ public class UIManager : MonoBehaviour
             OnMenuClick();
         }
         ToggleButtonGrp(false);
+        if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = false;
         if (slotManager) slotManager.StartSpin();
     }
 
@@ -362,7 +380,21 @@ public class UIManager : MonoBehaviour
         }
     }
 
-
+    void TurboToggle()
+    {
+        if (audioController) audioController.PlayButtonAudio();
+        if (slotManager.IsTurboOn)
+        {
+            slotManager.IsTurboOn = false;
+            Turbo_Button.GetComponent<ImageAnimation>().StopAnimation();
+            Turbo_Button.image.sprite = turboOriginalSprite;
+        }
+        else
+        {
+            slotManager.IsTurboOn = true;
+            Turbo_Button.GetComponent<ImageAnimation>().StartAnimation();
+        }
+    }
     #region AutoSpin
     private void OnATClick()
     {
@@ -382,7 +414,11 @@ public class UIManager : MonoBehaviour
             if (RayCast_Object) RayCast_Object.SetActive(true);
             if (AT_Transform) AT_Transform.DOLocalMoveX(0, 0.5f).OnComplete(delegate
             {
-                if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
+                if (!slotManager.IsSpinning)
+                {
+                    if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
+                }
+               
             });
             isAtOpen = true;
         }
@@ -393,7 +429,10 @@ public class UIManager : MonoBehaviour
             if (AT_Transform) AT_Transform.DOLocalMoveX(940, 0.5f).OnComplete(delegate
             {
                 if (AT_GameObject) AT_GameObject.SetActive(false);
-                if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
+                if (!slotManager.IsSpinning)
+                {
+                    if (AutoSpinPanel_Button) AutoSpinPanel_Button.interactable = true;
+                }
             });
             isAtOpen = false;
         }
@@ -645,10 +684,23 @@ public class UIManager : MonoBehaviour
     #region WinPopup
     private void ToggleWinPopup(bool isActive)
     {
+        CloseAllPopups();
         if (PopupMain_Object) PopupMain_Object.SetActive(isActive);
         if (NiceWinPopup) NiceWinPopup.SetActive(isActive);
     }
 
+    private void CloseAllPopups()
+    {
+        if (RulesPopup.activeSelf) RulesPopup.SetActive(false);
+        if (isAtOpen)
+        {
+            OnATClick();
+        }
+        if (isMenuOpen)
+        {
+            OnMenuClick();
+        }
+    }
     #endregion
 
     #region Miscellanious Popups
@@ -670,6 +722,10 @@ public class UIManager : MonoBehaviour
     #region InternalMethods
     internal void StoppingAutoSpin()
     {
+        if(isBetOpen)
+        {
+            OnBetClick();
+        }
         if (slotManager.IsAutoSpin)
         {
             if (StopAutoSpin_Button) StopAutoSpin_Button.interactable = false;
@@ -759,6 +815,8 @@ public class UIManager : MonoBehaviour
         }
         if (Spin_Button) Spin_Button.interactable = isActive;
         if (Bet_Button) Bet_Button.interactable = isActive;
+        if (Settings_Button) Settings_Button.interactable = isActive;
+        if (BetSettings_Button) BetSettings_Button.interactable = isActive;
     }
 
     internal void UpdateBalance(double balance)
@@ -772,12 +830,12 @@ public class UIManager : MonoBehaviour
         double prevBalance = double.Parse(BalanceMain_Text.text);
         double prevWinning = 0f;
         UpdateMessageText("Pays " + winning);
-        DOTween.To(() => prevBalance, (val) => prevBalance = val, balance, 5f).OnUpdate(() =>
+        DOTween.To(() => prevBalance, (val) => prevBalance = val, balance, 2f).OnUpdate(() =>
         {
             if (BalanceMain_Text) BalanceMain_Text.text = prevBalance.ToString("f2");
         });
 
-        DOTween.To(() => prevWinning, (val) => prevWinning = val, winning, 5f).OnUpdate(() =>
+        DOTween.To(() => prevWinning, (val) => prevWinning = val, winning, 2f).OnUpdate(() =>
         {
             if (WinMain_Text) WinMain_Text.text = prevWinning.ToString("f2");
         }).OnComplete(delegate { isComplete = true; });
@@ -791,6 +849,7 @@ public class UIManager : MonoBehaviour
         }
 
         yield return new WaitUntil(() => isComplete);
+        yield return new WaitForSeconds(0.5f);
     }
 
     internal void UpdateTweenBalance(double bet)
