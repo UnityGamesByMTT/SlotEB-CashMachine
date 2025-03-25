@@ -103,6 +103,11 @@ public class SlotController : MonoBehaviour
     internal void UpdateUI(double balance)
     {
         if (uiController) uiController.UpdateBalance(balance);
+        if (!uiController.CheckBalance(balance))
+        {
+            if (uiController) uiController.EnableLowBalance();
+        }
+
     }
 
     #region AutoSpin
