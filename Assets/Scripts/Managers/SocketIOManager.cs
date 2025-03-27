@@ -54,7 +54,7 @@ public class SocketIOManager : MonoBehaviour
         var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
         SocketURI = data.socketURL;
         myAuth = data.cookie;
-
+        nameSpace = data.nameSpace;
         // Proceed with connecting to the server using myAuth and socketURL
     }
 
