@@ -183,6 +183,8 @@ public class UIManager : MonoBehaviour
     private AudioController audioController;
     #endregion
 
+    [SerializeField] private SocketIOManager socketManager;
+
     private int SpinCount = 0;
     private int currentBet = 10;
     private bool isAtOpen = false;
@@ -280,7 +282,7 @@ public class UIManager : MonoBehaviour
         if (YesExit_Button) YesExit_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CallOnExitFunction(); });
 
         if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.RemoveAllListeners();
-        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(delegate { audioController.PlayButtonAudio(); CallOnExitFunction(); });
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(delegate { CallOnExitFunction(); socketManager.closeSocketReactnativeCall(); });
 
         if (CloseLB_Button) CloseLB_Button.onClick.RemoveAllListeners();
         if (CloseLB_Button) CloseLB_Button.onClick.AddListener(delegate { TogglePopup(LBPopup_Object); });
@@ -322,7 +324,7 @@ public class UIManager : MonoBehaviour
         }
 
         if (BetMain_Text) BetMain_Text.text = "10.00";
-        turboOriginalSprite = Turbo_Button.GetComponent<Image>().sprite;
+        turboOriginalSprite = Turbo_Button.GetComponent<Image>().sprite;       
     }
 
     internal void PopulateSymbolsPayout(Paylines paylines)
